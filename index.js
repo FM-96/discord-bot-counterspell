@@ -1,9 +1,23 @@
+var bodyParser = require('body-parser');
 var Discord = require('discord.js');
+var express = require('express');
+var app = express();
+var mongoose = require('mongoose');
+
 var fs = require('fs');
+var http = require('http');
 
 var botToken = null;
 var bot = new Discord.Client();
+
+var config = require('./config.json');
 var counterspells = require('./counterspells.js');
+var Trigger = require('./app/trigger/trigger.model.js');
+
+//use native promises for mongoose
+mongoose.Promise = Promise;
+
+mongoose.connect(config.db);
 
 //get discord bot token
 if (!fileExists(__dirname + '/discord_bot_token.txt')) {
@@ -20,24 +34,43 @@ if (!botToken) {
 	console.log('Bot token loaded.');
 }
 
+//set up webserver
+app.use(bodyParser.json());
+require('./app/routes.js')(app);
+app.use('/assets', express.static(__dirname + '/public/assets'));
+app.use(function (req, res) {
+	res.sendStatus(404);
+});
+var httpServer = http.createServer(app);
+
 bot.on('message', function (message) {
 	if (message.author.id === bot.user.id) {
 		return;
 	}
-	if (toDelete(message)) {
-		message.channel.sendMessage('__**' + counterspells[Math.floor(Math.random() * counterspells.length)] + '**__').then(function (sentMessage) {
-			return Promise.all([
-				message.delete(600),
-				sentMessage.delete(1400)
-			]);
-		}).catch(function (err) {
-			console.log('Error countering message: ' + error);
-		});
-	}
+
+	toDelete(message).then(
+		function (result) {
+			if (result) {
+				return message.channel.sendMessage('__**' + counterspells[Math.floor(Math.random() * counterspells.length)] + '**__');
+			}
+		}
+	).then(
+		function (sentMessage) {
+			if (sentMessage) {
+				return Promise.all([
+					message.delete(600),
+					sentMessage.delete(1400)
+				]);
+			}
+		}
+	).catch(
+		function (err) {
+			console.log('Error countering message: ' + err);
+		}
+	);
 });
 
 bot.on('ready', function () {
-	console.log('Successfully logged into Discord.');
 	console.log('Bot is ready.');
 });
 
@@ -50,31 +83,60 @@ bot.on('warn', function (warning) {
 });
 
 //start bot
-bot.login(botToken);
+bot.login(botToken).then(
+	function (result) {
+		//start webserver
+		httpServer.listen(config.port, function () {
+			console.log('Server started.');
+		});
+	}
+).catch(
+	function (error) {
+		if (error) {
+			console.error('Error while logging in: ' + error);
+			process.exit(1);
+		}
+	}
+);
 
 function toDelete(message) {
-	if (message.author.id === '219501150058184704') { //SandboxBot
-		if (message.content === 'sockpuppet? Oh, sockpuppet is dumb and ugly') {
-			return true;
+	return Trigger.find({
+		$and: [
+			{
+				$or: [
+					{ guildId: '*' },
+					{ guildId: message.guild.id }
+				]
+			},
+			{
+				$or: [
+					{ channelId: '*' },
+					{ channelId: message.channel.id }
+				]
+			},
+			{
+				$or: [
+					{ userId: '*' },
+					{ userId: message.author.id }
+				]
+			}
+		]
+	}).exec().then(
+		function (docs) {
+			for (let trigger of docs) {
+				if (trigger.method === 'exactly' && message.content === trigger.text) {
+					return true;
+				}
+				if (trigger.method === 'contains' && message.content.includes(trigger.text)) {
+					return true;
+				}
+				if (trigger.method === 'regex' && new RegExp(trigger.text).test(message.content)) {
+					return true;
+				}
+			}
+			return false;
 		}
-	}
-
-	if (message.author.id === '216179498683596802') { //PatricksBot
-		if (message.content.includes(', lol, who the fuck do you think you are? This incident has been logged and reported.')) {
-			return true;
-		}
-	}
-
-	if (message.author.id === '196059744991969280') { //FM-96's Test Bot (Nora)
-		if (message.content === 'Hey, that\'s code! I\'m made of that!') {
-			return true;
-		}
-		if (message.content === 'Yes! Let the airhorning commence!') {
-			return true;
-		}
-	}
-
-	return false;
+	);
 }
 
 //utility functions

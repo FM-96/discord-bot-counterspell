@@ -1,0 +1,4 @@
+{
+	"db": "mongodb://localhost/bot-counterspell",
+	"port": 42693
+}
