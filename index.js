@@ -50,7 +50,7 @@ bot.on('message', function (message) {
 	toDelete(message).then(
 		function (result) {
 			if (result) {
-				return message.channel.sendMessage('__**' + counterspells[Math.floor(Math.random() * counterspells.length)] + '**__');
+				return message.channel.send('__**' + counterspells[Math.floor(Math.random() * counterspells.length)] + '**__');
 			}
 		}
 	).then(
@@ -82,7 +82,7 @@ bot.on('warn', function (warning) {
 });
 
 // connect to database
-mongoose.connect(config.db).then(
+mongoose.connect(config.db, {useMongoClient: true}).then(
 	function (result) {
 		// start bot
 		return bot.login(botToken);
