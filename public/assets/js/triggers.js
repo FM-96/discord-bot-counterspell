@@ -1,7 +1,7 @@
 $(function () {
-	//update buttons
+	// update buttons
 	$('tbody').on('click', '.teal.button', function () {
-		$this = $(this);
+		var $this = $(this);
 		$this.addClass('loading');
 		var updatedTrigger = {
 			_id: $this.parent().parent().parent().data('id'),
@@ -9,7 +9,7 @@ $(function () {
 			channelId: $this.parent().parent().parent().find('input[name="channelId"]').val(),
 			userId: $this.parent().parent().parent().find('input[name="userId"]').val(),
 			method: $this.parent().parent().parent().find('input[name="method"]').val(),
-			text: $this.parent().parent().parent().find('input[name="text"]').val()
+			text: $this.parent().parent().parent().find('input[name="text"]').val(),
 		};
 		$.ajax({
 			contentType: 'application/json',
@@ -17,16 +17,16 @@ $(function () {
 			error: $.noop(),
 			method: 'post',
 			success: getAllTriggers,
-			url: '/api/trigger/update'
+			url: '/api/trigger/update',
 		});
 	});
 
-	//delete buttons
+	// delete buttons
 	$('tbody').on('click', '.red.button', function () {
-		$this = $(this);
+		var $this = $(this);
 		$this.addClass('loading');
 		var deletedTrigger = {
-			_id: $this.parent().parent().parent().data('id')
+			_id: $this.parent().parent().parent().data('id'),
 		};
 		$.ajax({
 			contentType: 'application/json',
@@ -34,20 +34,20 @@ $(function () {
 			error: $.noop(),
 			method: 'post',
 			success: getAllTriggers,
-			url: '/api/trigger/delete'
+			url: '/api/trigger/delete',
 		});
 	});
 
-	//add buttons
+	// add buttons
 	$('tbody').on('click', '.blue.button', function () {
-		$this = $(this);
+		var $this = $(this);
 		$this.addClass('loading');
 		var newTrigger = {
 			guildId: $this.parent().parent().find('input[name="guildId"]').val(),
 			channelId: $this.parent().parent().find('input[name="channelId"]').val(),
 			userId: $this.parent().parent().find('input[name="userId"]').val(),
 			method: $this.parent().parent().find('input[name="method"]').val(),
-			text: $this.parent().parent().find('input[name="text"]').val()
+			text: $this.parent().parent().find('input[name="text"]').val(),
 		};
 		$.ajax({
 			contentType: 'application/json',
@@ -55,7 +55,7 @@ $(function () {
 			error: $.noop(),
 			method: 'post',
 			success: getAllTriggers,
-			url: '/api/trigger/add'
+			url: '/api/trigger/add',
 		});
 	});
 
@@ -68,21 +68,21 @@ function getAllTriggers() {
 		error: getAllTriggersError,
 		method: 'get',
 		success: getAllTriggersSuccess,
-		url: '/api/trigger/all'
+		url: '/api/trigger/all',
 	});
 }
 
 function getAllTriggersError(jqHXR, textStatus, errorThrown) {
-	//TODO
+	// TODO
 }
 
 function getAllTriggersSuccess(data, textStatus, jqXHR) {
-	//delete all current rows from table
+	// delete all current rows from table
 	$('tbody').children().remove();
 
-	//add rows with triggers to table
-	for (var trigger of data) {
-		$triggerRow = $([
+	// add rows with triggers to table
+	for (let trigger of data) {
+		let $triggerRow = $([
 			'<tr class="center aligned" data-id="' + trigger._id + '">',
 			'	<td><div class="ui input"><input type="text" name="guildId" value="' + trigger.guildId + '"></div><!--<br>TODO--></td>',
 			'	<td><div class="ui input"><input type="text" name="channelId" value="' + trigger.channelId + '"></div><!--<br>TODO--></td>',
@@ -106,14 +106,14 @@ function getAllTriggersSuccess(data, textStatus, jqXHR) {
 			'			<button class="ui red button">Delete</button>',
 			'		</div>',
 			'	</td>',
-			'</tr>'
+			'</tr>',
 		].join('\n'));
-		
+
 		$('tbody').append($triggerRow);
 	}
 
-	//add last row to create new triggers to table
-	$addTriggerRow = $([
+	// add last row to create new triggers to table
+	var $addTriggerRow = $([
 		'<tr class="center aligned">',
 		'	<td><div class="ui input"><input type="text" name="guildId"></div></td>',
 		'	<td><div class="ui input"><input type="text" name="channelId"></div></td>',
@@ -132,9 +132,9 @@ function getAllTriggersSuccess(data, textStatus, jqXHR) {
 		'	</td>',
 		'	<td><div class="ui input"><input type="text" name="text"></div></td>',
 		'	<td><button class="ui fluid blue button">Add</button></td>',
-		'</tr>'
+		'</tr>',
 	].join('\n'));
-	
+
 	$('tbody').append($addTriggerRow);
 
 	$('.ui.dropdown').dropdown();

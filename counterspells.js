@@ -1,11 +1,11 @@
-//All applicable spells as of Eldritch Moon
-//Search query: o:"counter target spell" t:instant ci:u -o:unless -o:"additional cost" not:funny
+// All applicable spells as of Eldritch Moon
+// Search query: o:"counter target spell" t:instant ci:u -o:unless -o:"additional cost" not:funny
 module.exports = [
 	'Arcane Denial',
 	'Assert Authority',
 	'Broken Concentration',
 	'Cancel',
-	//'Confirm Suspicions',
+	// 'Confirm Suspicions',
 	'Contradict',
 	'Controvert',
 	'Counterbore',
@@ -13,7 +13,7 @@ module.exports = [
 	'Countermand',
 	'Counterspell',
 	'Cryptic Command',
-	//'Desertion',
+	// 'Desertion',
 	'Discombobulate',
 	'Dismal Failure',
 	'Dismiss',
@@ -26,10 +26,10 @@ module.exports = [
 	'Fold into Æther',
 	'Forbid',
 	'Force of Will',
-	//'Fuel for the Cause',
+	// 'Fuel for the Cause',
 	'Hinder',
 	'Last Word',
-	//'Lay Bare',
+	// 'Lay Bare',
 	'Lost in the Mist',
 	'Mana Drain',
 	'Memory Lapse',
@@ -50,5 +50,5 @@ module.exports = [
 	'Thwart',
 	'Traumatic Visions',
 	'Vex',
-	'Void Shatter'
+	'Void Shatter',
 ];

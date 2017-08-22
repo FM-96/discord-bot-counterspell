@@ -5,7 +5,7 @@ var schema = mongoose.Schema({
 	channelId: String,
 	userId: String,
 	method: String,
-	text: String
+	text: String,
 });
 
 module.exports = mongoose.model('Trigger', schema, 'triggers');

@@ -6,7 +6,7 @@ module.exports.updateTrigger = updateTrigger;
 var Trigger = require('./trigger.model.js');
 
 function addTrigger(req, res) {
-	//TODO validation
+	// TODO validation
 	var trigger = new Trigger(req.body);
 	trigger.save().then(
 		function (savedTrigger) {
@@ -44,7 +44,7 @@ function getAllTriggers(req, res) {
 }
 
 function updateTrigger(req, res) {
-	//TODO validation
+	// TODO validation
 	var id = req.body._id;
 	var updated = req.body;
 	delete updated._id;

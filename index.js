@@ -6,6 +6,7 @@ var mongoose = require('mongoose');
 
 var fs = require('fs');
 var http = require('http');
+var path = require('path');
 
 var botToken = null;
 var bot = new Discord.Client();
@@ -14,18 +15,18 @@ var config = require('./config.json');
 var counterspells = require('./counterspells.js');
 var Trigger = require('./app/trigger/trigger.model.js');
 
-//use native promises for mongoose
+// use native promises for mongoose
 mongoose.Promise = Promise;
 
 mongoose.connect(config.db);
 
-//get discord bot token
-if (!fileExists(__dirname + '/discord_bot_token.txt')) {
-	//create file
-	fs.closeSync(fs.openSync(__dirname + '/discord_bot_token.txt', 'w'));
+// get discord bot token
+if (!fileExists(path.join(__dirname, 'discord_bot_token.txt'))) {
+	// create file
+	fs.closeSync(fs.openSync(path.join(__dirname, 'discord_bot_token.txt'), 'w'));
 }
-//read token from file
-botToken = fs.readFileSync(__dirname + '/discord_bot_token.txt', 'utf8');
+// read token from file
+botToken = fs.readFileSync(path.join(__dirname, 'discord_bot_token.txt'), 'utf8');
 if (!botToken) {
 	console.log('No bot token found.');
 	console.log('Save the token in discord_bot_token.txt and restart the application.');
@@ -34,10 +35,10 @@ if (!botToken) {
 	console.log('Bot token loaded.');
 }
 
-//set up webserver
+// set up webserver
 app.use(bodyParser.json());
 require('./app/routes.js')(app);
-app.use('/assets', express.static(__dirname + '/public/assets'));
+app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
 app.use(function (req, res) {
 	res.sendStatus(404);
 });
@@ -59,7 +60,7 @@ bot.on('message', function (message) {
 			if (sentMessage) {
 				return Promise.all([
 					message.delete(600),
-					sentMessage.delete(1400)
+					sentMessage.delete(1400),
 				]);
 			}
 		}
@@ -82,10 +83,10 @@ bot.on('warn', function (warning) {
 	console.log('Discord Warning: ' + warning);
 });
 
-//start bot
+// start bot
 bot.login(botToken).then(
 	function (result) {
-		//start webserver
+		// start webserver
 		httpServer.listen(config.port, function () {
 			console.log('Server started.');
 		});
@@ -104,23 +105,23 @@ function toDelete(message) {
 		$and: [
 			{
 				$or: [
-					{ guildId: '*' },
-					{ guildId: message.guild.id }
-				]
+					{guildId: '*'},
+					{guildId: message.guild.id},
+				],
 			},
 			{
 				$or: [
-					{ channelId: '*' },
-					{ channelId: message.channel.id }
-				]
+					{channelId: '*'},
+					{channelId: message.channel.id},
+				],
 			},
 			{
 				$or: [
-					{ userId: '*' },
-					{ userId: message.author.id }
-				]
-			}
-		]
+					{userId: '*'},
+					{userId: message.author.id},
+				],
+			},
+		],
 	}).exec().then(
 		function (docs) {
 			for (let trigger of docs) {
@@ -139,10 +140,10 @@ function toDelete(message) {
 	);
 }
 
-//utility functions
-function fileExists(path) {
+// utility functions
+function fileExists(filePath) {
 	try {
-		fs.statSync(path);
+		fs.statSync(filePath);
 		return true;
 	} catch (e) {
 		return false;
