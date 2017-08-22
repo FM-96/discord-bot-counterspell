@@ -18,8 +18,6 @@ var Trigger = require('./app/trigger/trigger.model.js');
 // use native promises for mongoose
 mongoose.Promise = Promise;
 
-mongoose.connect(config.db);
-
 // get discord bot token
 if (!fileExists(path.join(__dirname, 'discord_bot_token.txt'))) {
 	// create file
@@ -83,8 +81,13 @@ bot.on('warn', function (warning) {
 	console.log('Discord Warning: ' + warning);
 });
 
-// start bot
-bot.login(botToken).then(
+// connect to database
+mongoose.connect(config.db).then(
+	function (result) {
+		// start bot
+		return bot.login(botToken);
+	}
+).then(
 	function (result) {
 		// start webserver
 		httpServer.listen(config.port, function () {
