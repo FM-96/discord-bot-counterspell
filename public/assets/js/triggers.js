@@ -13,8 +13,9 @@ $(function () {
 		};
 		$.ajax({
 			contentType: 'application/json',
+			context: this,
 			data: JSON.stringify(updatedTrigger),
-			error: $.noop(), // TODO add error handling
+			error: updateTriggerError,
 			method: 'post',
 			success: getAllTriggers,
 			url: '/api/trigger/update',
@@ -30,8 +31,9 @@ $(function () {
 		};
 		$.ajax({
 			contentType: 'application/json',
+			context: this,
 			data: JSON.stringify(deletedTrigger),
-			error: $.noop(), // TODO add error handling
+			error: deleteTriggerError,
 			method: 'post',
 			success: getAllTriggers,
 			url: '/api/trigger/delete',
@@ -51,8 +53,9 @@ $(function () {
 		};
 		$.ajax({
 			contentType: 'application/json',
+			context: this,
 			data: JSON.stringify(newTrigger),
-			error: $.noop(), // TODO add error handling
+			error: addTriggerError,
 			method: 'post',
 			success: getAllTriggers,
 			url: '/api/trigger/add',
@@ -61,6 +64,53 @@ $(function () {
 
 	getAllTriggers();
 });
+
+function addTriggerError(jqHXR, textStatus, errorThrown) {
+	var $this = $(this);
+	var $row = $this.parent().parent();
+	var $guildIdInput = $row.find('input[name="guildId"]').parent();
+	var $channelIdInput = $row.find('input[name="channelId"]').parent();
+	var $userIdInput = $row.find('input[name="userId"]').parent();
+	var $methodInput = $row.find('div.selection.dropdown');
+	var $textInput = $row.find('input[name="text"]').parent();
+
+	$this.removeClass('loading');
+
+	if (jqHXR.responseText.includes('guild ID not valid')) {
+		$guildIdInput.addClass('error');
+	} else {
+		$guildIdInput.removeClass('error');
+	}
+	if (jqHXR.responseText.includes('channel ID not valid')) {
+		$channelIdInput.addClass('error');
+	} else {
+		$channelIdInput.removeClass('error');
+	}
+	if (jqHXR.responseText.includes('user ID not valid')) {
+		$userIdInput.addClass('error');
+	} else {
+		$userIdInput.removeClass('error');
+	}
+	if (jqHXR.responseText.includes('method not valid')) {
+		$methodInput.addClass('error');
+	} else {
+		$methodInput.removeClass('error');
+	}
+	if (jqHXR.responseText.includes('text not valid')) {
+		$textInput.addClass('error');
+	} else {
+		$textInput.removeClass('error');
+	}
+}
+
+function deleteTriggerError(jqHXR, textStatus, errorThrown) {
+	var $this = $(this);
+	var $row = $this.parent().parent().parent();
+
+	$this.removeClass('loading');
+	$row.addClass('error');
+	$row.children().last().append('<i class="warning circle icon"></i>');
+}
 
 function getAllTriggers() {
 	$.ajax({
@@ -183,4 +233,42 @@ function getAllTriggersSuccess(data, textStatus, jqXHR) {
 	$('tbody').append($addTriggerRow);
 
 	$('.ui.dropdown').dropdown();
+}
+
+function updateTriggerError(jqHXR, textStatus, errorThrown) {
+	var $this = $(this);
+	var $row = $this.parent().parent().parent();
+	var $guildIdInput = $row.find('input[name="guildId"]').parent();
+	var $channelIdInput = $row.find('input[name="channelId"]').parent();
+	var $userIdInput = $row.find('input[name="userId"]').parent();
+	var $methodInput = $row.find('div.selection.dropdown');
+	var $textInput = $row.find('input[name="text"]').parent();
+
+	$this.removeClass('loading');
+
+	if (jqHXR.responseText.includes('guild ID not valid')) {
+		$guildIdInput.addClass('error');
+	} else {
+		$guildIdInput.removeClass('error');
+	}
+	if (jqHXR.responseText.includes('channel ID not valid')) {
+		$channelIdInput.addClass('error');
+	} else {
+		$channelIdInput.removeClass('error');
+	}
+	if (jqHXR.responseText.includes('user ID not valid')) {
+		$userIdInput.addClass('error');
+	} else {
+		$userIdInput.removeClass('error');
+	}
+	if (jqHXR.responseText.includes('method not valid')) {
+		$methodInput.addClass('error');
+	} else {
+		$methodInput.removeClass('error');
+	}
+	if (jqHXR.responseText.includes('text not valid')) {
+		$textInput.addClass('error');
+	} else {
+		$textInput.removeClass('error');
+	}
 }
