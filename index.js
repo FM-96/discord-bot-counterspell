@@ -19,9 +19,6 @@ var config = require('./config.json');
 var counterspells = require('./counterspells.js');
 var Trigger = require('./app/trigger/trigger.model.js');
 
-// use native promises for mongoose
-mongoose.Promise = Promise;
-
 // get discord bot token
 if (!fileExists(path.join(__dirname, 'discord_bot_token.txt'))) {
 	// create file
@@ -86,7 +83,7 @@ bot.on('warn', function (warning) {
 });
 
 // connect to database
-mongoose.connect(config.db, {useMongoClient: true}).then(
+mongoose.connect(config.db, {useNewUrlParser: true, useUnifiedTopology: true}).then(
 	function (result) {
 		// start bot
 		return bot.login(botToken);
