@@ -9,7 +9,11 @@ var http = require('http');
 var path = require('path');
 
 var botToken = null;
-var bot = new Discord.Client();
+var bot = new Discord.Client({
+	ws: {
+		intents: Discord.Intents.NON_PRIVILEGED,
+	},
+});
 
 var config = require('./config.json');
 var counterspells = require('./counterspells.js');
@@ -57,8 +61,8 @@ bot.on('message', function (message) {
 		function (sentMessage) {
 			if (sentMessage) {
 				return Promise.all([
-					message.delete(600),
-					sentMessage.delete(1400),
+					message.delete({timeout: 600}),
+					sentMessage.delete({timeout: 1400}),
 				]);
 			}
 		}
